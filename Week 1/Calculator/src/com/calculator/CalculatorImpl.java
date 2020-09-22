@@ -51,12 +51,20 @@ public class CalculatorImpl implements Calculator{
 		@Override
 		public int parse(String s) {
 			
+			int num1 = 0;
+			int num2 = 0;
+			
 			String test[] = s.split(" ");
 			
 			if (Character.isDigit(test[0].charAt(0))) {
 				
-				int num1 = Integer.parseInt(test[0]);
-				int num2 = Integer.parseInt(test[test.length-1]);
+				try {
+					num1 = Integer.parseInt(test[0]);
+					num2 = Integer.parseInt(test[test.length-1]);
+				} catch (Exception e) {
+					System.out.println("Invalid Operands");
+					return 0;
+				}
 				
 				switch (test[1]) {
 				case "+":  {
