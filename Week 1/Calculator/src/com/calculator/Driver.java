@@ -15,7 +15,7 @@ public class Driver {
 		
 		System.out.println(c.fibonacci(8));
 		
-		System.out.println(c.parse("10 - 5"));
+		System.out.println(c.parse("fib 8"));
 		
 	}
 }
