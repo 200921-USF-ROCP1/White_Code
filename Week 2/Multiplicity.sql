@@ -37,7 +37,7 @@ insert into users_accounts values
 
 
 
-select * from users u
+select username,sum(account_balance) as total_balance,count(account_id) as Number_of_accounts from users u
 	join users_accounts ua on u.id = ua.user_id
 	join accounts a on ua.account_id = a.id
-	where u.username = 'jacobd';
+	group by username;

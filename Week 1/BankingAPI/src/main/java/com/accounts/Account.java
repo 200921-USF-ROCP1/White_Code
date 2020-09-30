@@ -60,4 +60,7 @@ public class Account {
 	public String getType() {
 		return type.getAccountType();
 	}
+	public int getId() {
+		return accountId;
+	}
 }

@@ -1,7 +1,7 @@
-drop table if exists pets;
-drop table if exists cars;
-drop table if exists residents;
-drop table if exists apartments;
+drop table if exists pets cascade;
+drop table if exists cars cascade;
+drop table if exists residents cascade;
+drop table if exists apartments cascade; -- cascade removes order rules for dropping
 
 
 create table apartments (
