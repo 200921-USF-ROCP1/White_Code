@@ -10,21 +10,12 @@
   	</properties>
   
 	<dependencies>
-	
-		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
-		<dependency>
-		    <groupId>org.junit.jupiter</groupId>
-		    <artifactId>junit-jupiter-engine</artifactId>
-		    <version>5.7.0</version>
-		    <scope>test</scope>
-		</dependency>
 		
-		<!-- https://mvnrepository.com/artifact/org.junit.platform/junit-platform-runner -->
+		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
 		<dependency>
-		    <groupId>org.junit.platform</groupId>
-		    <artifactId>junit-platform-runner</artifactId>
-		    <version>1.7.0</version>
-		    <scope>test</scope>
+		    <groupId>org.postgresql</groupId>
+		    <artifactId>postgresql</artifactId>
+		    <version>42.2.16</version>
 		</dependency>
 		
 	</dependencies>

@@ -1,4 +1,4 @@
-package com.managment;
+package com.dao;
 
 import com.accounts.Account;
 import com.users.User;
@@ -13,15 +13,7 @@ public class StandardTransactions {
 		return accounts;
 	}
 	
-	//Add account to user
-	public static Account openAccount(User user, int typeId, double startBalance) {
-		
-		
-		Account acc = new Account(startBalance,typeId,2); //create an open account
-		
-		//generate new account in database
-		return acc;
-	}
+	
 	
 	// update a user
 	public static void updateUser(User oldUser, String username, String password, String first_name, String last_name, String enmail) {
@@ -45,7 +37,7 @@ public class StandardTransactions {
 	}
 	
 	// deposits, withdrawals and transactions
-	public static boolean moveMoney(User user, Account account, double amount) {
+	public boolean moveMoney(User user, Account account, double amount) {
 		// check user can access account (maybe not necessary)
 		
 		// get current balance
@@ -69,7 +61,7 @@ public class StandardTransactions {
 		return false;
 	}
 	
-	public static boolean moveMoney(User user, Account withdrawAcc, Account depositAcc, double amount) {
+	public boolean moveMoney(User user, Account withdrawAcc, Account depositAcc, double amount) {
 		// transfer between accounts
 
 		if (moveMoney(user, withdrawAcc, -amount)) { //if witdrawl is successful
@@ -80,22 +72,10 @@ public class StandardTransactions {
 		}
 	}
 	
-	//Add user to account
-	public static void addUserToAccount(User owner, int username, Account acc) {
-		// make sure user owns account (maybe not necessary)
-		Account[] ownerAccounts = getUserAccounts(owner);
-		for (int i = 0; i < ownerAccounts.length; i++) {
-			if (acc == ownerAccounts[i]) {
-				//add user with the correct username to accounts/user table
-				return;
-			}
-		}
-		System.out.println("You do not have access to this account");
-		
-	}
+	
 	
 	//Close account
-	public static void closeAccount(Account acc) {
+	public void closeAccount(Account acc) {
 		// check if balance is zero
 		if (acc.getBalance() > 0) {
 			System.out.println("This account must be empty before cancelation.");

@@ -1,4 +1,4 @@
-package com.managment;
+package com.dao;
 
 import com.accounts.Account;
 import com.users.User;
@@ -6,12 +6,12 @@ import com.users.User;
 public class AdminTransactions extends EmployeeTransactions{
 
 	// register a new user
-	public static void register(String username, String password, String first_name, String last_name, String email, int roleId) {
+	public void register(String username, String password, String first_name, String last_name, String email, int roleId) {
 		//create new user in database
 	}
 	
 	// deposits, withdrawals and transactions
-	public static boolean moveMoney(int accId, double amount) {
+	public boolean moveMoney(int accId, double amount) {
 		
 		// get account based off of account id
 		Account account = getAccount(accId);
@@ -37,29 +37,21 @@ public class AdminTransactions extends EmployeeTransactions{
 		return false;
 	}
 		
-	public static boolean moveMoney(int wAccId, int dAccId, double amount) {
+	public void moveMoney(int wAccId, int dAccId, double amount) {
 		// transfer between accounts
-
-		if (moveMoney(wAccId, -amount)) { //if withdrawal is successful
-			Boolean depositSuccess = moveMoney(dAccId, amount);
-			return depositSuccess ; //transaction completed
-		} else {
-			return false; //withdraw failed (not enough money)
-		}
+		moveMoney(wAccId, -amount);
+		moveMoney(dAccId, amount);
 	}
 			
 	// update a user
-	public static User updateUser(User oldUser, String username, String password, String first_name, String last_name, String email, int roleId) {
+	public User updateUser(User oldUser, String username, String password, String first_name, String last_name, String email, int roleId) {
 		// update all fields of user
 	}
 	
-	//update account
-	public static Account updateAccount(Account account) {
-		//send new account data to database
-	}
+	
 	
 	//Close account
-	public static void closeAccount(int accId) {
+	public void closeAccount(int accId) {
 		
 		Account acc = getAccount(accId);
 		
