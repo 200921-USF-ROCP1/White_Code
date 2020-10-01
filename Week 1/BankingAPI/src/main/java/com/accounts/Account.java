@@ -5,31 +5,31 @@ public class Account {
 	
 	private int accountId; // primary key
 	private double balance;  // not null
-	private AccountStatus status;
-	private AccountType type;
+	private AccountStatus status = new AccountStatus();
+	private AccountType type = new AccountType();
 	
 	//Constructors
 	public Account() {
 		
-		nextAccountId();
+		setAccountId(-1);
 		setType(1); //Checking
 		setStatus(1); //Pending
 		
 	}
-	public Account(double balance) {
-		nextAccountId();
+	public Account(int accountId, double balance) {
+		setAccountId(accountId);
 		setBalance(balance);
 		setType(1); //Checking
 		setStatus(1); //Pending
 	}
-	public Account(double balance, int typeId) {
-		nextAccountId();
+	public Account(int accountId, double balance, int typeId) {
+		setAccountId(accountId);
 		setBalance(balance);
 		setType(typeId);
 		setStatus(1); //Pending
 	}
-	public Account(double balance, int typeId, int statusId) {
-		nextAccountId();
+	public Account(int accountId, double balance, int typeId, int statusId) {
+		setAccountId(accountId);
 		setBalance(balance);
 		setType(typeId);
 		setStatus(statusId); 
@@ -37,8 +37,8 @@ public class Account {
 	
 	
 	//Set Data
-	private void nextAccountId() {
-		this.accountId = 1; //Retrieve next accountId from database
+	public void setAccountId(int accountId) {
+		this.accountId = accountId;
 	}
 	public void setBalance(double balance) {
 		this.balance = balance;

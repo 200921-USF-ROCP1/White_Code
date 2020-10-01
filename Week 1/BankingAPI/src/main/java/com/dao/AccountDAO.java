@@ -25,7 +25,7 @@ public class AccountDAO {
 	public Account openAccount(User user, int typeId, double startBalance) {
 		
 		
-		Account acc = new Account(startBalance,typeId,2); //create an open account
+		Account acc = new Account(0,startBalance,typeId,2); //create an open account
 		
 		//generate new account in database
 		createAccount(acc);
@@ -46,6 +46,7 @@ public class AccountDAO {
 	//get account
 	public Account getAccount(int accId) {
 		// get account from database
+		return null;
 	}
 	
 	//get account from database

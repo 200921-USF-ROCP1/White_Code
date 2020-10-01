@@ -24,7 +24,7 @@ public class ConnectionManager {
 				//Class.forName("org.postgresql.Driver"); //might not be necessary
 				
 				connection = DriverManager.getConnection(prop.getProperty("url"),prop.getProperty("username"),prop.getProperty("password"));
-				System.out.println("Connection Established!");
+				System.out.println("Connection Established!\n\n");
 	
 			} catch (Exception e) {
 				e.printStackTrace();

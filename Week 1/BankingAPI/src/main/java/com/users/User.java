@@ -9,12 +9,12 @@ public class User {
 	private String firstName; // not null
 	private String lastName; // not null
   	private String email; // not null
-  	private Role role;
+  	private Role role = new Role();
   	
   	// Constructor
   	public User() {
   		
-  		nextUserId();
+  		setUserId(-1);
   		setUsername("unknown");
   		setPassword("unknown");
   		setFirstName("unknown");
@@ -23,16 +23,16 @@ public class User {
   		setRole(3); //standard user
 
   	}
-  	public User(String username, String password, 
+  	public User(int userId, String username, String password, 
   				String firstName, String lastName, 
   				String email, int roleId) {
   		
-  		nextUserId();
-  		setUsername("username");
-  		setPassword("password");
-  		setFirstName("firstName");
-  		setLastName("lastName");
-  		setEmail("email");
+  		
+  		setUsername(username);
+  		setPassword(password);
+  		setFirstName(firstName);
+  		setLastName(lastName);
+  		setEmail(email);
   		setRole(roleId);
   		
   	}
@@ -61,9 +61,9 @@ public class User {
   	}
   	
   	// set data
-  	private void nextUserId() {
+  	public void setUserId(int userId) {
   		//retrieve next userId from database
-  		this.userId = 1;
+  		this.userId = userId;
   	}
   	public void setUsername(String username) {
   		this.username = username; 		

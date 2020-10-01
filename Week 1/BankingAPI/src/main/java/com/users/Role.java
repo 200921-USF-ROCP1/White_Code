@@ -1,6 +1,6 @@
 package com.users;
 
-class Role {
+public class Role {
 	// Tracks user permissions (Admin, Employee, Standard, or Premium)
 	//					roleId:	1		2			3			4
 	private int roleId; // primary key
