@@ -1,43 +1,48 @@
 package utils;
 
+import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 public class ConnectionManager {
-	static Connection connection;
+	private static Connection connection;
 	
-	
-	
-	public void startup() {
-	
-		final String connectionString = "jdbc:postgresql://lallah.db.elephantsql.com:5432/wqrvrrpg",
-				username = "wqrvrrpg",
-				password = "kGgeSLJ8Lmd4-qZjs59Y_R5tbjYcfMHZ";
-	
-		try {
-			//Class.forName("org.postgresql.Driver"); //might not be nessesary
-			
-			connection = DriverManager.getConnection(connectionString,username,password);
-			System.out.println("Connection Established!");
-						
-			executeSQL(connection);
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
+	public static Connection getConnection() {
+		
+		if (connection == null) { //create connection
+		
 			try {
-				if (connection != null){
-					//should be closed at end
-					connection.close();
-				}
+				// load sensitive data from local files
+				FileInputStream fis = new FileInputStream("connection.properties");
+				Properties prop = new Properties();
+				prop.load(fis);
+				//Class.forName("org.postgresql.Driver"); //might not be necessary
 				
-			} catch (SQLException e) {
+				connection = DriverManager.getConnection(prop.getProperty("url"),prop.getProperty("username"),prop.getProperty("password"));
+				System.out.println("Connection Established!");
+	
+			} catch (Exception e) {
 				e.printStackTrace();
+			} 
+		}
+		return connection;
+	}
+	
+	public static void closeConnection() {
+		try {
+			if (connection != null){
+				//should be closed at end
+				connection.close();
+				connection = null;
 			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 	}
 	
