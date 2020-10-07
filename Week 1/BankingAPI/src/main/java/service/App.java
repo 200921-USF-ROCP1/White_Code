@@ -28,6 +28,10 @@ public class App {
 			if (password.equalsIgnoreCase("exit")) break;
 			
 			user = userS.login(username,password);
+			if (user != null) {
+				System.out.println("\n");
+				accS.listUserAccounts(user);
+			}
 			
 			while (user != null) { //continue until exit
 				System.out.print("=:> ");
@@ -54,6 +58,42 @@ public class App {
 						System.out.println("You do not have permission to register a new user.\n");
 					break;
 				}
+				case "accounts": {
+					//list user accounts
+					if (user.getRole().toLowerCase().equals("admin") || user.getRole().toLowerCase().equals("employee")) {
+						//enter user id
+						System.out.println("User Id:");
+						int userId = sc.nextInt();
+						accS.listUserAccounts(userId);
+					} else 
+						//get users own accounts
+						accS.listUserAccounts(user);
+					break;
+				}
+				case "open": {
+					//open a new account
+					if (user.getRole().toLowerCase().equals("admin") || user.getRole().toLowerCase().equals("employee")) {
+						//enter user id
+						System.out.println("User Id:");
+						int userId = sc.nextInt();
+						accS.openAccount(userId);
+					} else 
+						//get users own accounts
+						accS.openAccount(user);
+					break;
+				}
+				case "withdraw": {
+					//withdraw money
+					if (user.getRole().toLowerCase().equals("admin") || user.getRole().toLowerCase().equals("employee")) {
+						//enter user id
+						System.out.println("User Id:");
+						int userId = sc.nextInt();
+						accS.openAccount(userId);
+					} else 
+						//get users own accounts
+						accS.openAccount(user);
+					break;
+				}
 				default: {
 					System.out.println("\tUnknown command.\n");
 				}
@@ -65,6 +105,7 @@ public class App {
 	}
 	public void finalize() {
 		ConnectionManager.closeConnection();
+		sc.close();
 	}
 	
 }

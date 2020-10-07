@@ -27,7 +27,7 @@ public class User {
   				String firstName, String lastName, 
   				String email, int roleId) {
   		
-  		
+  		setUserId(userId);
   		setUsername(username);
   		setPassword(password);
   		setFirstName(firstName);

@@ -2,11 +2,12 @@ package utils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import com.accounts.Account;
 import com.users.User;
 
-public class DatabaseConversion {
+public class Results {
 	
 	// Convert a result set into a user object
 	public static User result2User(ResultSet rs) throws SQLException {
@@ -30,5 +31,19 @@ public class DatabaseConversion {
 		} else 
 			return null;
 	}
+	
+	// Print a accounts result array to the screen
+	public static void printAccounts(ResultSet rs) throws SQLException { //must be joined to both type and status tables
+
+		int itr = 0;
+		while (rs.next()) {
+			System.out.println(String.format("%d) %s account #%d: $%.2f\t(%s)", 
+					++itr, rs.getString("type"), rs.getInt("account_id"), rs.getDouble("balance"), rs.getString("status")));
+		}
+		if (itr == 0) {
+			System.out.println("No accounts found.");
+		}
+	}
 }
+
 

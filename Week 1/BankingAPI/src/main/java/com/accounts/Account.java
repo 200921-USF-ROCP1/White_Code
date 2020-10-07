@@ -63,4 +63,28 @@ public class Account {
 	public int getId() {
 		return accountId;
 	}
+	public int getTypeId() {
+		switch (type.getAccountType()) {
+		case "Checking":
+			return 1;
+		case "Savings":
+			return 2;
+		default:
+			return 1;
+		}
+	}
+	public int getStatusId() {
+		switch (status.getAccountStatus()) {
+		case "Pending":
+			return 1;
+		case "Open":
+			return 2;
+		case "Closed":
+			return 2;
+		case "Denied":
+			return 2;
+		default:
+			return 2;
+		}
+	}
 }

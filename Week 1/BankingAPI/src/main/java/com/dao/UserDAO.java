@@ -11,7 +11,7 @@ import com.accounts.Account;
 import com.users.User;
 
 import utils.ConnectionManager;
-import utils.DatabaseConversion;
+import utils.Results;
 
 public class UserDAO {
 	PreparedStatement ps;
@@ -47,7 +47,7 @@ public class UserDAO {
 		ps.setInt(1, userId);
 		ResultSet rs = ps.executeQuery();
 		
-		return DatabaseConversion.result2User(rs);
+		return Results.result2User(rs);
 	}
 	public User getUserByUsername(String username) throws SQLException {
 		// get user by username
@@ -56,7 +56,7 @@ public class UserDAO {
 		ps.setString(1, username);
 		ResultSet rs = ps.executeQuery();
 		
-		return DatabaseConversion.result2User(rs);
+		return Results.result2User(rs);
 	}
 	
 	//get all users
