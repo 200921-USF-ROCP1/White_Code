@@ -10,6 +10,7 @@ public class User {
 	private String lastName; // not null
   	private String email; // not null
   	private Role role = new Role();
+  	public int roleId;
   	
   	// Constructor
   	public User() {
@@ -20,7 +21,7 @@ public class User {
   		setFirstName("unknown");
   		setLastName("unknown");
   		setEmail("unknown");
-  		setRole(3); //standard user
+  		setRole(4); //standard user
 
   	}
   	public User(int userId, String username, String password, 
@@ -53,11 +54,11 @@ public class User {
   	public String getLastName() {
   		return lastName;	
   	}
-  	public String getEmail(String email) {
+  	public String getEmail() {
   		return email;	
   	}
-  	public String getRole() {
-  		return role.getRole();
+  	public Role getRole() {
+  		return role;
   	}
   	
   	// set data
@@ -80,7 +81,7 @@ public class User {
   	public void setEmail(String email) {
   		this.email = email;	
   	}
-  	private void setRole(int roleId) {
+  	public void setRole(int roleId) {
   		role.setRole(roleId);		
   	}
 }

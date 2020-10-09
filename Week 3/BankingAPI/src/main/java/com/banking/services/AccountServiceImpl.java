@@ -1,57 +1,106 @@
 package com.banking.services;
 
+import com.banking.dao.AccountDAOImpl;
+import com.banking.interfaces.AccountDAO;
 import com.banking.interfaces.AccountService;
 import com.banking.models.Account;
-import com.sun.tools.javac.util.List;
+
+import java.sql.SQLException;
+import java.util.List;
 
 public class AccountServiceImpl implements AccountService {
+	private static AccountDAO aDAO = new AccountDAOImpl();
 
-	@Override
-	public Account moveMoney(Account acc, double amount) {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean moveMoney(int accId, double amount) {
+		Account acc;
+		try {
+			acc = aDAO.retrieve(accId); //get account to move money into/from
+			acc.setBalance(acc.getBalance() + amount); //set new account balance
+			
+			if (acc.getBalance() >= 0) {
+				aDAO.update(acc);
+				return true;
+				
+			} else return false;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
-	@Override
-	public Account moveMoney(Account withdrawAcc, Account depositAcc, double amount) {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean moveMoney(int withdrawId, int depositId, double amount) {
+		//withdraw from first account
+		boolean success = moveMoney(withdrawId,-amount);
+		if (success) { //deposit in second account
+			success = moveMoney(depositId,amount);
+		} else return false;
+		return success;
+		
 	}
-
-	@Override
+	
 	public List<Account> getAllAccounts() {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return aDAO.getAll();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
-	@Override
 	public Account getAccountById(int accId) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return aDAO.retrieve(accId);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
-	@Override
 	public List<Account> getAccountsByStatus(int statusId) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return aDAO.getAllByStatus(statusId);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
-	@Override
 	public List<Account> getAccountsByUser(int userId) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return aDAO.getAllByUser(userId);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
-	@Override
 	public Account openAccount(Account acc) {
-		// TODO Auto-generated method stub
-		return null;
+		//create account
+		try {
+			return aDAO.create(acc);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public Account openAccount(Account acc, int userId) {
+		Account account = openAccount(acc);
+		try {
+			aDAO.addUserToAccount(userId, account.getId());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return account;
 	}
 
-	@Override
 	public Account updateAccount(Account acc) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			aDAO.update(acc);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return acc;
 	}
-
 }

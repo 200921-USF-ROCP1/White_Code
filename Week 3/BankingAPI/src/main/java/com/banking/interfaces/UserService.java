@@ -1,13 +1,11 @@
 package com.banking.interfaces;
 
 import com.banking.models.User;
-import com.sun.tools.javac.util.List;
+import java.util.List;
 
 public interface UserService {
 	
 	public User login(String username, String password);
-	
-	public void logout();
 	
 	public User register(User user);
 	
@@ -17,7 +15,7 @@ public interface UserService {
 	
 	public User getUserByUsername(String username);
 	
-	public User updateUser(int userId);
+	public User updateUser(User user);
 	
 	
 	

@@ -1,6 +1,6 @@
 package com.banking.models;
 
-class AccountStatus {
+public class AccountStatus {
 	//used to track the status of accounts. 
 	//Status possibilities are Pending, Open, Closed, or Denied
 	
@@ -19,7 +19,7 @@ class AccountStatus {
 	// Set account status
 	public void setAccountStatus(int statusId) {
 		// set status based on statusId key
-		this.statusId = statusId;
+		this.setStatusId(statusId);
 		
 		switch (statusId) {
 		case 1:
@@ -46,6 +46,12 @@ class AccountStatus {
 	
 	public String getAccountStatus() {
 		return status;
+	}
+	public int getStatusId() {
+		return statusId;
+	}
+	public void setStatusId(int statusId) {
+		this.statusId = statusId;
 	}
 }
 

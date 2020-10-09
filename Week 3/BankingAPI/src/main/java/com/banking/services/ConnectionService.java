@@ -1,13 +1,8 @@
 package com.banking.services;
 
-import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
 
 public class ConnectionService {
 	private static Connection connection;
@@ -18,16 +13,18 @@ public class ConnectionService {
 		
 			try {
 				// load sensitive data from local files
-				FileInputStream fis = new FileInputStream("connection.properties");
-				Properties prop = new Properties();
-				prop.load(fis);
-				//Class.forName("org.postgresql.Driver"); //might not be necessary
+				Class.forName("org.postgresql.Driver"); //might not be necessary
 				
-				connection = DriverManager.getConnection(prop.getProperty("url"),prop.getProperty("username"),prop.getProperty("password"));
-				System.out.println("Connection Established!\n\n");
+				String url = "jdbc:postgresql://lallah.db.elephantsql.com:5432/wqrvrrpg";
+				String username = "wqrvrrpg";
+				String password = "kGgeSLJ8Lmd4-qZjs59Y_R5tbjYcfMHZ";
+					
+				connection = DriverManager.getConnection(url,username,password);
+				//System.out.println("Connection Established!\n\n");
 	
 			} catch (Exception e) {
 				e.printStackTrace();
+				closeConnection();
 			} 
 		}
 		return connection;

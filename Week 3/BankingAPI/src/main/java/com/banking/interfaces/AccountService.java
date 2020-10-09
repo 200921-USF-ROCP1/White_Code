@@ -1,13 +1,13 @@
 package com.banking.interfaces;
 
 import com.banking.models.Account;
-import com.sun.tools.javac.util.List;
+import java.util.List;
 
 public interface AccountService {
 	
-	public Account moveMoney(Account acc, double amount);
+	public boolean moveMoney(int accId, double amount);
 	
-	public Account moveMoney(Account withdrawAcc, Account depositAcc, double amount);
+	public boolean moveMoney(int withdrawId, int depositId, double amount);
 	
 	public List<Account> getAllAccounts();
 	
@@ -18,6 +18,8 @@ public interface AccountService {
 	public List<Account> getAccountsByUser(int userId);
 	
 	public Account openAccount(Account acc);
+	
+	public Account openAccount(Account acc, int userId);
 	
 	public Account updateAccount(Account acc);
 	

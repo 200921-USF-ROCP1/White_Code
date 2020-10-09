@@ -1,4 +1,8 @@
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -28,10 +32,15 @@ public class App {
 		//new DemoClass dc2 = unmarshalFromXml(demoString);
 		
 		//JSON
+		
+		
 		System.out.println(marshalToJson(dc));
 		
-		String json = "{\"i\":15,\"s\":\"bye\",\"b\":true}";
-		System.out.println(unmarshalFromJson(json).getS());
+		//as if from request.getReader
+		BufferedReader jsonData = new BufferedReader(new StringReader("{\"i\":56,\"s\":\"Hi there!\",\"b\":false}"));
+		
+		//String json = jsonData.lines().collect(Collectors.joining("\n"));
+		System.out.println(unmarshalFromJson(jsonData).getS());
 		
 	}
 	
@@ -69,6 +78,22 @@ public class App {
 		
 		return null;
 	}
+	public static DemoClass unmarshalFromJson(BufferedReader json) {
+		try {
+			return mapper.readValue(json,DemoClass.class);
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
 	public static DemoClass unmarshalFromJson(String json) {
 		try {
 			return mapper.readValue(json,DemoClass.class);
@@ -78,7 +103,7 @@ public class App {
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} 
 		
 		return null;
 	}

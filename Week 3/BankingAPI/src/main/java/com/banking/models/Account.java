@@ -7,6 +7,8 @@ public class Account {
 	private double balance;  // not null
 	private AccountStatus status = new AccountStatus();
 	private AccountType type = new AccountType();
+	public int statusId;
+	public int typeId;
 	
 	//Constructors
 	public Account() {
@@ -28,7 +30,7 @@ public class Account {
 		setType(typeId);
 		setStatus(1); //Pending
 	}
-	public Account(int accountId, double balance, int typeId, int statusId) {
+	public Account(int accountId, double balance, int statusId, int typeId) {
 		setAccountId(accountId);
 		setBalance(balance);
 		setType(typeId);
@@ -46,7 +48,7 @@ public class Account {
 	public void setStatus(int statusId) {
 		status.setAccountStatus(statusId);
 	}
-	private void setType(int typeId) {
+	public void setType(int typeId) {
 		type.setAccountType(typeId);
 	}
 	
@@ -54,37 +56,13 @@ public class Account {
 	public double getBalance() {
 		return balance;
 	}
-	public String getStatus() {
-		return status.getAccountStatus();
+	public AccountStatus getStatus() {
+		return status;
 	}
-	public String getType() {
-		return type.getAccountType();
+	public AccountType getType() {
+		return type;
 	}
 	public int getId() {
 		return accountId;
-	}
-	public int getTypeId() {
-		switch (type.getAccountType()) {
-		case "Checking":
-			return 1;
-		case "Savings":
-			return 2;
-		default:
-			return 1;
-		}
-	}
-	public int getStatusId() {
-		switch (status.getAccountStatus()) {
-		case "Pending":
-			return 1;
-		case "Open":
-			return 2;
-		case "Closed":
-			return 2;
-		case "Denied":
-			return 2;
-		default:
-			return 2;
-		}
 	}
 }

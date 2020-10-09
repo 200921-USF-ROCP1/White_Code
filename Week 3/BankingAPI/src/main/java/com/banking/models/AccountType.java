@@ -1,6 +1,6 @@
 package com.banking.models;
 
-class AccountType {
+public class AccountType {
 	//used to track what kind of account is being created. 
 	//Type possibilities are Checking or Savings
 	
@@ -19,7 +19,7 @@ class AccountType {
 	// Set account type
 	public void setAccountType(int typeId) {
 		// set type based on typeId key
-		this.typeId = typeId;
+		this.setTypeId(typeId);
 		
 		switch (typeId) {
 		case 1:
@@ -37,5 +37,11 @@ class AccountType {
 	
 	public String getAccountType() {
 		return type;
+	}
+	public int getTypeId() {
+		return typeId;
+	}
+	public void setTypeId(int typeId) {
+		this.typeId = typeId;
 	}
 }

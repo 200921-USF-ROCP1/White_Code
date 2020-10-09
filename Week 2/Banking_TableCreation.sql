@@ -63,8 +63,8 @@ create table user_accounts(
 insert into roles(role) values
 	('Admin'),
 	('Employee'),
-	('Standard'),
-	('Premium');
+	('Premium'),
+	('Standard');
 
 insert into account_status(status) values
 	('Pending'),
@@ -96,5 +96,9 @@ select a.*,s.status,t.type from user_accounts ua
 	join accounts a on ua.account_id = a.account_id
 	natural join account_type t 
 	natural join account_status s 
-	where ua.user_id = 1
+	where a.status_id = 1
 	order by t.type, s.status;
+	
+update users
+	set username = 'mcoakley', password = '1234', first_name = 'Marina', last_name = 'Coakley', email = 'FinleysMom@gmail.com', role_id = 4
+	where user_id = 3;
