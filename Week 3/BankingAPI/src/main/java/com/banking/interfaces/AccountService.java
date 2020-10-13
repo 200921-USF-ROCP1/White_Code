@@ -19,8 +19,12 @@ public interface AccountService {
 	
 	public Account openAccount(Account acc);
 	
-	public Account openAccount(Account acc, int userId);
+	public void addUserToAccount(int userId, int accId);
 	
 	public Account updateAccount(Account acc);
+	
+	public void accrueInterest(int months);
+	
+	public boolean deleteAccount(int accId);
 	
 }

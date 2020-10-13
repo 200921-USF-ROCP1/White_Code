@@ -85,14 +85,12 @@ public class AccountServiceImpl implements AccountService {
 		}
 	}
 	
-	public Account openAccount(Account acc, int userId) {
-		Account account = openAccount(acc);
+	public void addUserToAccount(int userId,int accId) {
 		try {
-			aDAO.addUserToAccount(userId, account.getId());
+			aDAO.addUserToAccount(userId, accId);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return account;
 	}
 
 	public Account updateAccount(Account acc) {
@@ -102,5 +100,30 @@ public class AccountServiceImpl implements AccountService {
 			e.printStackTrace();
 		}
 		return acc;
+	}
+
+	public void accrueInterest(int months) {
+		double savingsRate = .05/12; // APY to monthly
+		double checkingRate = .02/12;
+		
+		double savingsInterest = Math.pow(1+savingsRate,months);
+		double checkingInterest = Math.pow(1+checkingRate,months);
+		
+		try {
+			aDAO.addInterest(savingsInterest, checkingInterest);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	public boolean deleteAccount(int accId) {
+		try {
+			aDAO.delete(accId);
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 }

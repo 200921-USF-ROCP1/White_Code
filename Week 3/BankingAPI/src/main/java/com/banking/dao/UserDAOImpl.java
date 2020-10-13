@@ -37,7 +37,7 @@ public class UserDAOImpl implements UserDAO {
 		rs = ps.getResultSet(); //get account id
 		rs.next();
 		
-		t.setUserId(rs.getInt("account_id"));
+		t.setUserId(rs.getInt("user_id"));
 		return t;
 	}
 
@@ -49,7 +49,8 @@ public class UserDAOImpl implements UserDAO {
 		ResultSet rs = ps.executeQuery();
 		
 		User user = ResultManager.result2User(rs);
-		user.setPassword(null);
+		if (user != null)
+			user.setPassword(null);
 		
 		return user;
 	}
@@ -81,7 +82,7 @@ public class UserDAOImpl implements UserDAO {
 	public List<User> getAll() throws SQLException {
 		List<User> users = new ArrayList<User>();
 		//retrieve all accounts owned by a user
-		ps = connection.prepareStatement("select u.* from users u",
+		ps = connection.prepareStatement("select u.* from users u order by user_id",
 										ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		rs = ps.executeQuery();
 		

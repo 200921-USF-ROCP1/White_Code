@@ -73,7 +73,7 @@ public class AccountDAOImpl implements AccountDAO {
 	public List<Account> getAll() throws SQLException {
 		List<Account> accounts = new ArrayList<Account>();
 		//retrieve all accounts owned by a user
-		ps = connection.prepareStatement("select a.* from accounts a",
+		ps = connection.prepareStatement("select a.* from accounts a order by account_id",
 				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		rs = ps.executeQuery();
 		
@@ -95,7 +95,7 @@ public class AccountDAOImpl implements AccountDAO {
 		List<Account> accounts = new ArrayList<Account>();
 		//retrieve all accounts owned by a user
 		ps = connection.prepareStatement("select a.* from accounts a\r\n" + 
-											" where a.status_id = ?",
+											" where a.status_id = ? order by account_id",
 										ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		ps.setInt(1, statusId);
 		rs = ps.executeQuery();
@@ -120,7 +120,7 @@ public class AccountDAOImpl implements AccountDAO {
 		ps = connection.prepareStatement("select a.* from user_accounts ua\r\n" + 
 				"	join accounts a on ua.account_id = a.account_id\r\n" + 
 				"	natural join account_status s\r\n" + 
-				"	where ua.user_id = ?",
+				"	where ua.user_id = ? order by account_id",
 				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		ps.setInt(1, userId);
 		rs = ps.executeQuery();
@@ -147,6 +147,27 @@ public class AccountDAOImpl implements AccountDAO {
 		
 		ps.execute();
 		
+	}
+
+	public void addInterest(double savingsAmount, double checkingAmount) throws SQLException {
+		/* set new balance based on interest amounts
+			I=[P(1+i)^n]-P
+			I: interest
+			P: current amount (principal)
+			(1+i)^n: savingsAmount/checkingAmount
+		 */
+		//Savings
+		ps = connection.prepareStatement("update accounts "
+				+ "set balance = balance * ? "
+				+ "where type_id = ?");
+		ps.setDouble(1, savingsAmount); //interest modifier
+		ps.setInt(2, 2); //account type
+		ps.executeUpdate();
+		
+		//Checking
+		ps.setDouble(1, checkingAmount); //interest modifier
+		ps.setInt(2, 1); //account type
+		ps.executeUpdate();
 	}	
 
 }

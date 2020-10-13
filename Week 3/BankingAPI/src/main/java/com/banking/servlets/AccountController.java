@@ -29,6 +29,7 @@ public class AccountController extends HttpServlet {
 	private List<Account> accs;
 	private String jsonString = null;
 	private int errorCode = 400;
+	private JsonNode node;
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		sm.createSession(request); //check if logged in
@@ -36,9 +37,7 @@ public class AccountController extends HttpServlet {
 			response.sendError(403);
 			return;
 		}
-		
-		JsonNode node = interp.getNode(request);
-		
+
 		String path = request.getRequestURI(); // "BankingAPI/accounts/withdraw
 		String[] parts = path.split("/"); // ["","BankingAPI","accounts","withdraw"]
 		
@@ -46,6 +45,7 @@ public class AccountController extends HttpServlet {
 			switch (parts[3].toLowerCase()) {
 			
 			case "withdraw": {
+				node = interp.getNode(request);
 				int accId = node.get("accountId").asInt();
 				double amount = node.get("amount").asDouble();
 				
@@ -56,12 +56,13 @@ public class AccountController extends HttpServlet {
 						//return message
 						jsonString = String.format("$%.2f has been withdrawn from Account #%d",
 								amount, accId);
-					}
+					} 
 				} else errorCode = 401;
 				break;
 			}
 			
 			case "deposit": {
+				node = interp.getNode(request);
 				int accId = node.get("accountId").asInt();
 				double amount = node.get("amount").asDouble();
 				
@@ -78,6 +79,7 @@ public class AccountController extends HttpServlet {
 			}
 			
 			case "transfer": {
+				node = interp.getNode(request);
 				int accId = node.get("sourceAccountId").asInt();
 				int transId = node.get("targetAccountId").asInt();
 				double amount = node.get("amount").asDouble();
@@ -178,7 +180,6 @@ public class AccountController extends HttpServlet {
 			response.sendError(errorCode);
 			errorCode = 400;
 		}
-		
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -188,30 +189,51 @@ public class AccountController extends HttpServlet {
 			return;
 		}
 		
-		// -- Submit account --
-		
 		String path = request.getRequestURI(); // "BankingAPI/accounts/1
 		String[] parts = path.split("/"); // ["","BankingAPI","accounts","1"]
 		
-		// get account from JSON
-		acc = interp.unmarshal(request);
-		acc.setStatus(acc.statusId);
-		acc.setType(acc.typeId);
 		
-		if (parts.length == 4) { // user specifeid alongside new account
+		
+		if (parts.length == 4) { // -- user specified alongside new account -- 
 			
 			// use /accounts/:id to create an account for that user.
 			if (StringUtils.isInteger(parts[3])) { //parse userId from uri
 				int userId = Integer.parseInt(parts[3]); //get accId for uri
 				
+				// get account from JSON
+				acc = interp.unmarshal(request);
+				acc.setStatus(acc.statusId);
+				acc.setType(acc.typeId);
+				
 				// authenticate based on userId and session user
 				if (Authentication.canAccess("Employee") || sm.getUser().getUserId() == userId ) {
-					acc = aServ.openAccount(acc,userId);
+					acc = aServ.openAccount(acc);
+					aServ.addUserToAccount(userId, acc.getId());
 					jsonString = interp.marshal(acc);
 				} else response.sendError(401);
-			} else response.sendError(400);
+				
+			} else if(parts[3].equals("add"))  { // -- Add a user to account --
+				node = interp.getNode(request);
+				int userId = node.get("userId").asInt();
+				int accId = node.get("accountId").asInt();
+				
+				if (Authentication.canAccess("Admin") || ownsAccount(sm.getUser(),accId) ) {
+					if (Authentication.canAccess("Premium")) { //if you own the account, must be a premium user
+						aServ.addUserToAccount(userId, accId);
+						response.setStatus(202); //created
+						jsonString = String.format("User %d added to Account #%d", userId,accId); //response
+						
+					} else response.sendError(401,"Must be a 'Premium' user to add others to your account.");
+				} else response.sendError(401, "Only an Admin can change other people's accounts.");
+			} else response.sendError(400,"Invalid address.");
 			
-		} else { //create an account without a user
+		} else { // -- create an account without a user -- 
+			
+			// get account from JSON
+			acc = interp.unmarshal(request);
+			acc.setStatus(acc.statusId);
+			acc.setType(acc.typeId);
+			
 			if (Authentication.canAccess("Employee")) {
 				acc = aServ.openAccount(acc);
 				jsonString = interp.marshal(acc);
@@ -259,6 +281,32 @@ public class AccountController extends HttpServlet {
 			errorCode = 400;
 		}
 	}
+	
+	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		sm.createSession(request); //check if logged in
+		if (sm.getUser() == null) {
+			response.sendError(403);
+			return;
+		}
+		
+		String path = request.getRequestURI(); // "BankingAPI/accounts/remove/1
+		String[] parts = path.split("/"); // ["","BankingAPI","accounts","remove","1"]
+		
+		if (parts.length == 5) { //correct input length
+			if(StringUtils.isInteger(parts[4])) { //parse uri
+				int accId = Integer.parseInt(parts[4]);
+				
+				// authenticate logged-in account
+				if (Authentication.canAccess("Admin")) {
+					if (aServ.deleteAccount(accId)) { //account deleted successfully
+						response.getWriter().println(String.format("Account #%d deleted successfully.", accId));
+					} else response.sendError(400, "Deletion failed.");
+					
+				} else response.sendError(401,"Not authorized");
+			}
+		} else response.sendError(400,"Please specify a account id.");
+	}
+	
 	
 	//check if a user owns the account specified
 	private boolean ownsAccount(User user, int accId) {

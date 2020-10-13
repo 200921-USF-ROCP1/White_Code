@@ -1,5 +1,6 @@
 package com.banking.interfaces;
 
+import com.banking.models.Account;
 import com.banking.models.User;
 import java.util.List;
 
@@ -16,6 +17,10 @@ public interface UserService {
 	public User getUserByUsername(String username);
 	
 	public User updateUser(User user);
+	
+	public User upgradeToPremium(User user, int accId);
+	
+	public boolean deleteUser(int userId);
 	
 	
 	

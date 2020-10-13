@@ -12,5 +12,7 @@ public interface AccountDAO extends GenericDAO<Account>{
 	public List<Account> getAllByUser(int userId) throws SQLException;
 	
 	public void addUserToAccount(int userId, int accId) throws SQLException;
+	
+	public void addInterest(double savingsAmount, double checkingAmount) throws SQLException;
 
 }

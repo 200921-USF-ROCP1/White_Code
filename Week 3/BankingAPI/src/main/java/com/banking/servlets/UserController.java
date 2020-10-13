@@ -18,6 +18,7 @@ import com.banking.utils.Authentication;
 import com.banking.utils.JsonInterp;
 import com.banking.utils.SessionManager;
 import com.banking.utils.StringUtils;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class UserController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -26,8 +27,10 @@ public class UserController extends HttpServlet {
 	private static UserService uServ = new UserServiceImpl();
 	private static SessionManager sm = new SessionManager();
 	
+	
 	private User user;
 	private List<User> users;
+	private JsonNode node;
 	private String jsonString = null;
 	private int errorCode = 400;
 	
@@ -82,18 +85,57 @@ public class UserController extends HttpServlet {
 			return;
 		}
 		
-		// -- Update user --
-		
-		if (Authentication.canAccess("Admin")) {
-			//get user from json
-			user = interp.unmarshal(request);
-			user.setRole(user.roleId);
-			//update user
-			user = uServ.updateUser(user);
-			//send response
-			jsonString = interp.marshal(user);
-			response.getWriter().println(jsonString);
-		} else response.sendError(401);
-	}
+		String path = request.getRequestURI(); // "BankingAPI/user/upgrade
+		String[] parts = path.split("/"); // ["","BankingAPI","user","upgrade"]
 
+		if (parts.length == 4) { // -- upgrade user to premium -- 
+			node = interp.getNode(request);
+			
+			int userId = node.get("userId").asInt();
+			int accId = node.get("accountId").asInt();
+			
+			user = uServ.getUserById(userId);
+			if (user.getRole().getRole().equals("Standard")) { //only standard users can upgrade
+				user = uServ.upgradeToPremium(user, accId); // upgrade
+				response.getWriter().println(interp.marshal(user)); //return user
+			} else response.sendError(400,"Only 'Standard' users can upgrade");
+			
+		} else { // -- Update user info -- 
+			if (Authentication.canAccess("Admin")) {
+				//get user from json
+				user = interp.unmarshal(request);
+				user.setRole(user.roleId);
+				//update user
+				user = uServ.updateUser(user);
+				//send response
+				jsonString = interp.marshal(user);
+				response.getWriter().println(jsonString);
+			} else response.sendError(401);
+		}
+	}
+	
+	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		sm.createSession(request); //check if logged in
+		if (sm.getUser() == null) {
+			response.sendError(403);
+			return;
+		}
+		
+		String path = request.getRequestURI(); // "BankingAPI/user/remove/1
+		String[] parts = path.split("/"); // ["","BankingAPI","user","remove","1"]
+		
+		if (parts.length == 5) { //correct input length
+			if(StringUtils.isInteger(parts[4])) { //parse uri
+				int userId = Integer.parseInt(parts[4]);
+				
+				// authenticate logged-in user
+				if (Authentication.canAccess("Admin")) {
+					if (uServ.deleteUser(userId)) { //user deleted successfully
+						response.getWriter().println(String.format("User %d deleted successfully.", userId));
+					} else response.sendError(400, "Deletion failed.");
+					
+				} else response.sendError(401,"Not authorized");
+			}
+		} else response.sendError(400,"Please specify a user id.");
+	}
 }
