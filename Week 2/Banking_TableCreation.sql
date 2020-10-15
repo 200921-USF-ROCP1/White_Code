@@ -83,7 +83,7 @@ insert into users(username, password, first_name, last_name, email, role_id) val
 	
 
 SELECT * FROM users;
-select * from accounts;
+select * from accounts order by account_id ;
 select * from user_accounts;
 select * from account_status;
 

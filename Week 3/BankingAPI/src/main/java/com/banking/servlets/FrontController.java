@@ -46,25 +46,23 @@ public class FrontController extends HttpServlet {
 						response.setStatus(202); //accepted
 						System.out.printf("%s %s has logged in.\n\n",user.getFirstName(),user.getLastName());
 						response.getWriter().println(interp.marshal(user));
-					} else {
-						response.getWriter().println("Invalid username and password combination");
-					}
+					} else response.sendError(401, "Invalid username and password combination.");
 					
-				} else response.sendError(405); //method not allowed
+				} else response.sendError(405, "Please log out before logging in a new user."); //method not allowed
 				break;
 			}
 			case "logout": {
 				if (sm.getUser() == null) //no user logged in
-					response.sendError(403);
+					response.sendError(403, "Not logged in.");
 				else {
 					sm.closeSession();
-					response.setStatus(200);
+					response.getWriter().println("You have been logged out.");
 				}
 				break;
 			}
 			case "register": {
 				if (sm.getUser() == null) { //check if logged in 
-					response.sendError(403);
+					response.sendError(403, "Not logged in.");
 					break;
 				}
 				if (Authentication.canAccess("Admin")) { //must be admin
@@ -72,12 +70,12 @@ public class FrontController extends HttpServlet {
 					user.setRole(user.roleId);
 					uServ.register(user); //create user in db
 					response.getWriter().println(interp.marshal(user));
-				} else response.sendError(401);
+				} else response.sendError(401, "Only an admin can register a new user.");
 				break;
 			}
 			case "time": { // add interest to accounts based on time
 				if (sm.getUser() == null) { //check if logged in 
-					response.sendError(403);
+					response.sendError(403, "Not logged in.");
 					break;
 				}
 				if (Authentication.canAccess("Admin")) { //must be admin
@@ -87,7 +85,7 @@ public class FrontController extends HttpServlet {
 					response.setStatus(202); //accepted
 					response.getWriter().println(String.format("%d months have passed...", months));
 					
-				} else response.sendError(401);
+				} else response.sendError(401, "Only an admin can accelerate time itself.");
 				break;
 			}
 			}

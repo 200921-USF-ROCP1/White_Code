@@ -32,13 +32,12 @@ public class UserController extends HttpServlet {
 	private List<User> users;
 	private JsonNode node;
 	private String jsonString = null;
-	private int errorCode = 400;
 	
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		sm.createSession(request); //check if logged in
 		if (sm.getUser() == null) {
-			response.sendError(403);
+			response.sendError(403, "Not logged in.");
 			return;
 		}
 		
@@ -55,25 +54,24 @@ public class UserController extends HttpServlet {
 				if (Authentication.canAccess("Employee") || sm.getUser().getUserId() == userId ) {
 					user = uServ.getUserById(userId);
 					// return user
-					jsonString = interp.marshal(user);
-				} else errorCode = 401;
-			}
+					if (user != null) jsonString = interp.marshal(user); //check if user was found
+					else response.sendError(404, "User not found");
+					
+				} else response.sendError(401, "You do not have access to this user.");
+			} else response.sendError(400);
 		} else {
 			// -- lookup all users -- 
 			if (Authentication.canAccess("Employee")) {
 				users = uServ.getAllUsers();
 				//return users
 				jsonString = interp.marshal(users);
-			} else errorCode = 401;
+			} else response.sendError(401, "Employee access only.");
 		}
 		
 		//return output
 		if (jsonString != null) {
 			response.getWriter().println(jsonString); //send json string
 			jsonString = null;
-		} else {
-			response.sendError(errorCode);
-			errorCode = 400;
 		}
 
 	}
@@ -81,7 +79,7 @@ public class UserController extends HttpServlet {
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		sm.createSession(request); //check if logged in
 		if (sm.getUser() == null) {
-			response.sendError(403);
+			response.sendError(403, "Not logged in.");
 			return;
 		}
 		
@@ -110,14 +108,14 @@ public class UserController extends HttpServlet {
 				//send response
 				jsonString = interp.marshal(user);
 				response.getWriter().println(jsonString);
-			} else response.sendError(401);
+			} else response.sendError(401, "Only an admin can update user information.");
 		}
 	}
 	
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		sm.createSession(request); //check if logged in
 		if (sm.getUser() == null) {
-			response.sendError(403);
+			response.sendError(403, "Not logged in.");
 			return;
 		}
 		
@@ -130,11 +128,19 @@ public class UserController extends HttpServlet {
 				
 				// authenticate logged-in user
 				if (Authentication.canAccess("Admin")) {
+					
+					//check if account exists
+					user = uServ.getUserById(userId);
+					if (user == null) {
+						response.sendError(404, "User not found.");
+						return;
+					}
+					
 					if (uServ.deleteUser(userId)) { //user deleted successfully
 						response.getWriter().println(String.format("User %d deleted successfully.", userId));
 					} else response.sendError(400, "Deletion failed.");
 					
-				} else response.sendError(401,"Not authorized");
+				} else response.sendError(401,"Only an admin can delete accounts.");
 			}
 		} else response.sendError(400,"Please specify a user id.");
 	}

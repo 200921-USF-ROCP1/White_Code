@@ -28,13 +28,12 @@ public class AccountController extends HttpServlet {
 	private Account acc;
 	private List<Account> accs;
 	private String jsonString = null;
-	private int errorCode = 400;
 	private JsonNode node;
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		sm.createSession(request); //check if logged in
 		if (sm.getUser() == null) {
-			response.sendError(403);
+			response.sendError(403, "Not logged in.");
 			return;
 		}
 
@@ -49,6 +48,11 @@ public class AccountController extends HttpServlet {
 				int accId = node.get("accountId").asInt();
 				double amount = node.get("amount").asDouble();
 				
+				if (amount < 0) { //make sure amount is positive
+					response.sendError(400,"Amount must be positive");
+					return;
+				}
+				
 				if (Authentication.canAccess("Admin") || ownsAccount(sm.getUser(),accId) ) {
 					// complete withdrawal
 					if (aServ.moveMoney(accId, -amount)) { //withdraw successful
@@ -56,8 +60,8 @@ public class AccountController extends HttpServlet {
 						//return message
 						jsonString = String.format("$%.2f has been withdrawn from Account #%d",
 								amount, accId);
-					} 
-				} else errorCode = 401;
+					} else response.sendError(400, "Withdrawal failed.");
+				} else response.sendError(401, "You do not have access to this account.");
 				break;
 			}
 			
@@ -66,15 +70,20 @@ public class AccountController extends HttpServlet {
 				int accId = node.get("accountId").asInt();
 				double amount = node.get("amount").asDouble();
 				
+				if (amount < 0) { //make sure amount is positive
+					response.sendError(400,"Amount must be positive");
+					return;
+				}
+				
 				if (Authentication.canAccess("Admin") || ownsAccount(sm.getUser(),accId) ) {
 					// complete deposit
-					if (aServ.moveMoney(accId, amount)) { //withdraw successful
+					if (aServ.moveMoney(accId, amount)) { //deposit successful
 						response.setStatus(200);
 						//return message
 						jsonString = String.format("$%.2f has been deposited in Account #%d",
 								amount, accId);
-					}
-				} else errorCode = 401;
+					} else response.sendError(400, "Deposit failed.");
+				} else response.sendError(401, "You do not have access to this account.");
 				break;
 			}
 			
@@ -84,15 +93,20 @@ public class AccountController extends HttpServlet {
 				int transId = node.get("targetAccountId").asInt();
 				double amount = node.get("amount").asDouble();
 				
+				if (amount < 0) { //make sure amount is positive
+					response.sendError(400,"Amount must be positive");
+					return;
+				}
+				
 				if (Authentication.canAccess("Admin") || ownsAccount(sm.getUser(),accId) ) {
 					// complete transfer
-					if (aServ.moveMoney(accId, transId, amount)) { //withdraw successful
+					if (aServ.moveMoney(accId, transId, amount)) { //transfer successful
 						response.setStatus(200);
 						//return message
 						jsonString = String.format("$%.2f has been transferred from Account #%d to Account #%d",
 								amount, accId, transId);
-					}
-				} else errorCode = 401;
+					} else response.sendError(400, "Transfer failed.");
+				} else response.sendError(401, "You do not have access to this account.");
 				break;
 			}
 			
@@ -107,9 +121,9 @@ public class AccountController extends HttpServlet {
 							//return account
 							jsonString = interp.marshal(accs);
 							
-						} else errorCode = 404;
+						} else response.sendError(401, "Accounts not found.");
 					}
-				} else errorCode = 401;
+				} else response.sendError(401, "Employee access only.");
 				break;
 			}
 			
@@ -125,8 +139,8 @@ public class AccountController extends HttpServlet {
 								//return account
 								jsonString = interp.marshal(accs);
 								
-							} else errorCode = 404;
-						}  else errorCode = 401;
+							} else response.sendError(404, "Account not found");
+						}  else response.sendError(401, "You do not have access to this account.");
 					}
 				} else { //user wants own accounts
 					accs = aServ.getAccountsByUser(sm.getUser().getUserId()); //get accounts
@@ -135,7 +149,7 @@ public class AccountController extends HttpServlet {
 						//return account
 						jsonString = interp.marshal(accs);
 						
-					} else errorCode = 404;
+					} else response.sendError(404, "You do not have any accounts.");
 				}
 				break;
 			}
@@ -153,9 +167,9 @@ public class AccountController extends HttpServlet {
 							//return account
 							jsonString = interp.marshal(acc);
 							
-						} else errorCode = 404;
-					} else errorCode = 401;
-				}
+						} else response.sendError(404, "Account not found.");
+					} else response.sendError(401, "You must own this account to access it.");
+				} else response.sendError(400);
 				break;
 			}
 			}
@@ -168,24 +182,21 @@ public class AccountController extends HttpServlet {
 					//return account
 					jsonString = interp.marshal(accs);
 					
-				} else errorCode = 404;
-			} else errorCode = 401;
+				} else response.sendError(404, "Accounts not found.");
+			} else response.sendError(401, "Employee access only.");
 		}
 		
 		//return output
 		if (jsonString != null) {
 			response.getWriter().println(jsonString); //send json string
 			jsonString = null;
-		} else {
-			response.sendError(errorCode);
-			errorCode = 400;
 		}
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		sm.createSession(request); //check if logged in
 		if (sm.getUser() == null) {
-			response.sendError(403);
+			response.sendError(403, "Not logged in.");
 			return;
 		}
 		
@@ -237,7 +248,7 @@ public class AccountController extends HttpServlet {
 			if (Authentication.canAccess("Employee")) {
 				acc = aServ.openAccount(acc);
 				jsonString = interp.marshal(acc);
-			} response.sendError(401);
+			} response.sendError(401, "Employee access only");
 			
 		}
 		
@@ -245,16 +256,13 @@ public class AccountController extends HttpServlet {
 		if (jsonString != null) {
 			response.getWriter().println(jsonString); //send json string
 			jsonString = null;
-		} else {
-			response.sendError(errorCode);
-			errorCode = 400;
 		}
 	}
 	
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		sm.createSession(request); //check if logged in
 		if (sm.getUser() == null) {
-			response.sendError(403);
+			response.sendError(403, "Not logged in.");
 			return;
 		}
 		
@@ -268,7 +276,7 @@ public class AccountController extends HttpServlet {
 			acc = aServ.updateAccount(acc);
 			//return account
 			jsonString = interp.marshal(acc);
-		} else response.sendError(401);
+		} else response.sendError(401, "Only an admin can update accounts.");
 		
 		
 		
@@ -276,16 +284,13 @@ public class AccountController extends HttpServlet {
 		if (jsonString != null) {
 			response.getWriter().println(jsonString); //send json string
 			jsonString = null;
-		} else {
-			response.sendError(errorCode);
-			errorCode = 400;
 		}
 	}
 	
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		sm.createSession(request); //check if logged in
 		if (sm.getUser() == null) {
-			response.sendError(403);
+			response.sendError(403, "Not logged in.");
 			return;
 		}
 		
@@ -298,11 +303,19 @@ public class AccountController extends HttpServlet {
 				
 				// authenticate logged-in account
 				if (Authentication.canAccess("Admin")) {
+					
+					//check if account exists
+					acc = aServ.getAccountById(accId);
+					if (acc == null) {
+						response.sendError(404, "Account not found.");
+						return;
+					}
+					
 					if (aServ.deleteAccount(accId)) { //account deleted successfully
 						response.getWriter().println(String.format("Account #%d deleted successfully.", accId));
 					} else response.sendError(400, "Deletion failed.");
 					
-				} else response.sendError(401,"Not authorized");
+				} else response.sendError(401,"Only an admin can delete accounts.");
 			}
 		} else response.sendError(400,"Please specify a account id.");
 	}
